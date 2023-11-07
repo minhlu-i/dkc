@@ -6,8 +6,8 @@ This repository is dedicated to storing various docker-compose.yml files used to
 
 Currently, we have docker-compose files for the following services:
 
-- RabbitMQ
-- PostgreSQL and PgAdmin4
+- [RabbitMQ](rabbit-mq.docker-compose.yml)
+- [PostgreSQL and PgAdmin4](postgresql-pgadmin4.docker-compose.yml)
 
 ## Usage
 

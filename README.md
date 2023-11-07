@@ -8,6 +8,7 @@ Currently, we have docker-compose files for the following services:
 
 - [RabbitMQ](rabbit-mq.docker-compose.yml)
 - [PostgreSQL and PgAdmin4](postgresql-pgadmin4.docker-compose.yml)
+- [Redis](redis-stack.docker-compose.yml)
 
 ## Usage
 

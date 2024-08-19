@@ -19,5 +19,5 @@ To use these docker-compose files, follow these steps:
 3. Run the following command:
 
 ```bash
-docker-compose -f <filename> up -d
+docker compose -f <filename> up -d
 ```

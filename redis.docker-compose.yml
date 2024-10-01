@@ -4,7 +4,9 @@ services:
     container_name: redis
     hostname: redis
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+      - ALLOW_EMPTY_PASSWORD=yes # Dev mode only
+    volumes:
+      - ./data/redis:/data
     ports:
       - "6379:6379" # Expose Redis port to host
     networks:

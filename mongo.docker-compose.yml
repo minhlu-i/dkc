@@ -9,4 +9,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: localhost
       MONGO_INITDB_ROOT_PASSWORD: localhost
     volumes:
-      - ./mongodb_data/:/data/db/
+      - ./data/mongo/:/data/db/

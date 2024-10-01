@@ -6,8 +6,9 @@ This repository is dedicated to storing various docker-compose.yml files used to
 
 Currently, we have docker-compose files for the following services:
 
-- [RabbitMQ](rabbit-mq.docker-compose.yml)
+- [MongoDB](mongo.docker-compose.yml)
 - [PostgreSQL and PgAdmin4](postgresql-pgadmin4.docker-compose.yml)
+- [RabbitMQ](rabbit-mq.docker-compose.yml)
 - [Redis](redis-stack.docker-compose.yml)
 
 ## Usage
@@ -20,4 +21,10 @@ To use these docker-compose files, follow these steps:
 
 ```bash
 docker compose -f <filename> up -d
+```
+
+to down the container.
+
+```bash
+docker compose -f <filename> down
 ```

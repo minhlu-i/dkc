@@ -1,0 +1,28 @@
+services:
+  redis:
+    image: bitnami/redis
+    container_name: redis
+    hostname: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "6379:6379" # Expose Redis port to host
+    networks:
+      - redis-network
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    user: redis
+    networks:
+      - redis-network
+
+networks:
+  redis-network:
+    driver: bridge

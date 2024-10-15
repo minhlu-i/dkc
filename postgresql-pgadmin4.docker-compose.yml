@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres_container
-    image: postgres
+    image: postgres:latest
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-localhost}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localhost}
@@ -16,7 +16,7 @@ services:
 
   pgadmin:
     container_name: pgadmin_container
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@admin.vn}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}

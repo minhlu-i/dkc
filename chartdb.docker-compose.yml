@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   chartdb:
     image: ghcr.io/chartdb/chartdb:latest

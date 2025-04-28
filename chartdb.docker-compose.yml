@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  chartdb:
+    image: ghcr.io/chartdb/chartdb:latest
+    ports:
+      - "8999:80"
+    # environment:
+    #   - OPENAI_API_KEY=your_openai_api_key
+    restart: unless-stopped

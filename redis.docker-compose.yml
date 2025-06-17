@@ -25,6 +25,20 @@ services:
     networks:
       - redis-network
 
+  redisinsight:
+    container_name: redisinsight
+    hostname: redisinsight
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - ./data/redisinsight:/data
+    networks:
+      - redis-network
+
+  
+
 networks:
   redis-network:
     driver: bridge

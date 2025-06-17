@@ -1,0 +1,22 @@
+# pgAdmin
+pgadmin.localhost {
+        tls internal
+        reverse_proxy localhost:5050
+}
+
+# RabbitMQ Management
+rabbit-mq.localhost {
+        tls internal
+        reverse_proxy localhost:15672
+}
+
+# Redis Commander
+redis-commander.localhost {
+        tls internal
+        reverse_proxy localhost:8081
+}
+
+red-insight.localhost {
+        tls internal
+        reverse_proxy localhost:5540
+}

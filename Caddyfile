@@ -20,3 +20,8 @@ red-insight.localhost {
         tls internal
         reverse_proxy localhost:5540
 }
+
+chartdb.localhost {
+        tls internal
+        reverse_proxy localhost:8999
+}

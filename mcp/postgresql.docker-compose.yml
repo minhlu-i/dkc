@@ -1,0 +1,5 @@
+# https://github.com/crystaldba/postgres-mcp
+
+services:
+  postgres-mcp:
+    image: crystaldba/postgres-mcp

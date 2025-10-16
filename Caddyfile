@@ -1,27 +1,27 @@
-# pgAdmin
-pgadmin.localhost {
-        tls internal
-        reverse_proxy localhost:5050
+# Adminer (PostgreSQL Admin)
+adminer.localhost {
+	tls internal
+	reverse_proxy localhost:8080
 }
 
 # RabbitMQ Management
 rabbit-mq.localhost {
-        tls internal
-        reverse_proxy localhost:15672
+	tls internal
+	reverse_proxy localhost:15672
 }
 
 # Redis Commander
 redis-commander.localhost {
-        tls internal
-        reverse_proxy localhost:8081
+	tls internal
+	reverse_proxy localhost:8081
 }
 
 red-insight.localhost {
-        tls internal
-        reverse_proxy localhost:5540
+	tls internal
+	reverse_proxy localhost:5540
 }
 
 chartdb.localhost {
-        tls internal
-        reverse_proxy localhost:8999
+	tls internal
+	reverse_proxy localhost:8999
 }

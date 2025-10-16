@@ -6,11 +6,11 @@
 
 ## 📦 Available Services
 
-Currently, you’ll find docker-compose files for these popular services:
+Currently, you'll find docker-compose files for these popular services:
 
-* **ChartDb** (`chartdb.docker-compose.yml`)
+* **ChartDB** (`chartdb.docker-compose.yml`)
 * **MongoDB** (`mongo.docker-compose.yml`)
-* **PostgreSQL & PgAdmin4** (`postgresql-pgadmin4.docker-compose.yml`)
+* **PostgreSQL & Adminer** (`postgresql-adminer.docker-compose.yml`)
 * **RabbitMQ** (`rabbit-mq.docker-compose.yml`)
 * **Redis Stack** (`redis-stack.docker-compose.yml`)
 
@@ -32,7 +32,10 @@ Currently, you’ll find docker-compose files for these popular services:
    ```
 
    *Example:*
-   `docker compose -f mongo.docker-compose.yml up -d`
+
+   ```bash
+   docker compose -f postgresql-adminer.docker-compose.yml up -d
+   ```
 
 3. **Stop and remove the service when done:**
 
@@ -44,43 +47,148 @@ Currently, you’ll find docker-compose files for these popular services:
 
 ## 🌐 Access Services with Friendly Local Domains Using Caddy
 
-Instead of accessing your service at `localhost:<port>`, set up **Caddy** to use pretty local domains like `pgadmin.localhost`, `mongo.localhost`, etc.
+Instead of accessing your services at `localhost:<port>`, use **Caddy** to access them via pretty local domains like `adminer.localhost`, `rabbit-mq.localhost`, etc.
 
-### 1. Install Caddy (Homebrew for macOS)
+### Option 1: Run Caddy Standalone (Recommended)
+
+Run Caddy directly from this directory without system-wide installation:
 
 ```bash
+# Start Caddy with your Caddyfile (foreground)
+caddy run --config Caddyfile
+
+# Or run in background
+caddy start --config Caddyfile
+
+# After editing Caddyfile, reload config (zero downtime)
+caddy reload --config Caddyfile
+
+# Stop Caddy
+caddy stop
+```
+
+**Note:** You must specify `--config Caddyfile` when running from a custom directory. Caddy will remember this path for reload commands.
+
+### Option 2: Install Caddy as System Service (macOS)
+
+If you prefer running Caddy as a system service:
+
+```bash
+# Install via Homebrew
 brew install caddy
-```
 
-### 2. (Optional) Soft link your `Caddyfile` to `/opt/homebrew/etc/`
+# Copy Caddyfile to Caddy config directory
+cp Caddyfile /opt/homebrew/etc/Caddyfile
 
-```bash
-ln -sf $(pwd)/Caddyfile /opt/homebrew/etc/Caddyfile
-```
-
-### 3. Start or restart the Caddy service
-
-```bash
+# Start service
 brew services start caddy
-# or restart if already running
+
+# Restart after config changes
 brew services restart caddy
 ```
 
-### 4. Access your services
+**Note:** With Option 2, you need to manually copy `Caddyfile` each time you update it.
 
-Open your browser and navigate to:
+### Access your services
 
-* `https://pgadmin.localhost/`
-* `https://mongo.localhost/`
-* ... (depending on your `Caddyfile` configuration)
+Once Caddy is running, open your browser and navigate to:
+
+* **Adminer (PostgreSQL):** <https://adminer.localhost>
+* **RabbitMQ Management:** <https://rabbit-mq.localhost>
+* **Redis Commander:** <https://redis-commander.localhost>
+* **Red Insight (Redis):** <https://red-insight.localhost>
+* **ChartDB:** <https://chartdb.localhost>
+
+---
+
+## 🔧 Service-Specific Configuration
+
+### PostgreSQL & Adminer
+
+**Environment Variables** (optional `.env` file):
+
+```bash
+# PostgreSQL
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_PORT=5432
+
+# Adminer
+ADMINER_PORT=8080
+```
+
+**Access Adminer:**
+
+* **Via Caddy:** <https://adminer.localhost>
+* **Direct:** <http://localhost:8080>
+
+**Login credentials:**
+
+* Server: `postgres` (auto-filled via ADMINER_DEFAULT_SERVER)
+* Username: `postgres` (or your POSTGRES_USER)
+* Password: `postgres` (or your POSTGRES_PASSWORD)
+* Database: Leave empty or specify your database name
 
 ---
 
 ## 📝 Additional Notes
 
-* **Caddy** will automatically provide HTTPS certificates for your local domains – no manual SSL setup required.
-* Want to add a new service? Simply add its compose file to this folder and update the README if needed.
-* If you run into port or domain issues, double-check your compose and Caddyfile configurations.
+### Caddy Benefits
+
+* **Auto HTTPS:** Automatically provides HTTPS certificates for local domains – no manual SSL setup required
+* **Zero Downtime:** Use `caddy reload` to apply config changes without stopping
+* **Simple Config:** Clean, easy-to-read Caddyfile syntax
+
+### Troubleshooting
+
+**Port conflicts:**
+
+```bash
+# Check what's using a port
+lsof -i :<port_number>
+
+# Example: Check PostgreSQL port
+lsof -i :5432
+```
+
+**Caddy not working:**
+
+```bash
+# Validate Caddyfile syntax
+caddy validate --config Caddyfile
+
+# Format Caddyfile
+caddy fmt --overwrite Caddyfile
+
+# Check if ports 80/443 are available
+sudo lsof -i :80
+sudo lsof -i :443
+```
+
+**Docker service not starting:**
+
+```bash
+# View logs
+docker compose -f <filename> logs -f
+
+# Check container status
+docker ps -a
+```
+
+### Adding New Services
+
+1. Create `service-name.docker-compose.yml`
+2. Add to `Caddyfile`:
+
+   ```caddyfile
+   service-name.localhost {
+       tls internal
+       reverse_proxy localhost:<port>
+   }
+   ```
+
+3. Reload Caddy: `caddy reload --config Caddyfile`
+4. Update this README
 
 ---
 

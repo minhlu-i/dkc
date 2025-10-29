@@ -32,6 +32,7 @@ services:
     container_name: redisinsight
     hostname: redisinsight
     image: redis/redisinsight:latest
+    user: "0:0"  # Run as root to fix permission issues
     volumes:
       - ./data/redisinsight:/data
     networks:

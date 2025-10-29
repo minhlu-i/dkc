@@ -11,34 +11,39 @@ services:
       - "6379:6379" # Expose Redis port to host
     networks:
       - redis-network
+    restart: unless-stopped
 
   redis-commander:
     container_name: redis-commander
     hostname: redis-commander
     image: ghcr.io/joeferner/redis-commander:latest
-    restart: always
     environment:
       - REDIS_HOSTS=local:redis:6379
-    ports:
-      - "8081:8081"
     user: redis
     networks:
       - redis-network
+      - caddy
+    labels:
+      caddy: redis-commander.localhost
+      caddy.reverse_proxy: "{{upstreams 8081}}"
+    restart: unless-stopped
 
   redisinsight:
     container_name: redisinsight
     hostname: redisinsight
     image: redis/redisinsight:latest
-    restart: always
-    ports:
-      - "5540:5540"
     volumes:
       - ./data/redisinsight:/data
     networks:
       - redis-network
-
-  
+      - caddy
+    labels:
+      caddy: redisinsight.localhost
+      caddy.reverse_proxy: "{{upstreams 5540}}"
+    restart: unless-stopped
 
 networks:
   redis-network:
     driver: bridge
+  caddy:
+    external: true

@@ -1,4 +1,26 @@
-# databases volumes
-data
+# Data volumes
+data/
+*/data/
 
-.vscode
+# Environment files
+.env
+**/.env
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Certificates
+*.crt
+*.pem
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp

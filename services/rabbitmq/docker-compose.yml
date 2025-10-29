@@ -7,14 +7,19 @@ services:
       RABBITMQ_DEFAULT_PASS: "rabbitmq"
     ports:
       - 5672:5672
-      - 15672:15672
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
       - rabbitmq
+      - caddy
+    labels:
+      caddy: rabbitmq.localhost
+      caddy.reverse_proxy: "{{upstreams 15672}}"
     restart: unless-stopped
 
 networks:
   rabbitmq:
     driver: bridge
+  caddy:
+    external: true

@@ -1,103 +1,144 @@
 # DKC – Docker Compose Library for Developers
 
-**This folder is a collection of ready-to-use `docker-compose.yml` files, making it easy to set up popular development services quickly.**
+**A collection of ready-to-use Docker Compose services for development, making it easy to set up popular tools quickly with automatic HTTPS via Caddy Docker Proxy.**
 
 ---
 
 ## 📦 Available Services
 
-Currently, you'll find docker-compose files for these popular services:
+Each service is in its own directory with documentation:
 
-* **ChartDB** (`chartdb.docker-compose.yml`)
-* **MongoDB** (`mongo.docker-compose.yml`)
-* **PostgreSQL & Adminer** (`postgresql-adminer.docker-compose.yml`)
-* **RabbitMQ** (`rabbit-mq.docker-compose.yml`)
-* **Redis Stack** (`redis-stack.docker-compose.yml`)
+* **[Caddy](services/caddy/)** - Automatic reverse proxy with HTTPS
+* **[PostgreSQL + Adminer](services/postgres/)** - SQL database with web UI
+* **[MongoDB + Mongo Express](services/mongo/)** - NoSQL database with web UI
+* **[Redis + Commander + RedisInsight](services/redis/)** - In-memory database with web UIs
+* **[RabbitMQ](services/rabbitmq/)** - Message broker with management UI
+* **[ChartDB](services/chartdb/)** - Database schema visualization
+* **[Whoami](services/whoami/)** - Simple service for testing Caddy setup
 
 ---
 
 ## 🚀 Getting Started
 
-1. **Clone this repository:**
+### 1. Clone this repository
 
-   ```bash
-   git clone https://github.com/minhlu-i/dkc.git
-   cd dkc
-   ```
+```bash
+git clone https://github.com/minhlu-i/dkc.git
+cd dkc
+```
 
-2. **Spin up the service you need:**
+### 2. Create the Caddy network (REQUIRED - First Time Only)
 
-   ```bash
-   docker compose -f <filename> up -d
-   ```
+Before running any services, create the external `caddy` network:
 
-   *Example:*
+```bash
+docker network create caddy
+```
 
-   ```bash
-   docker compose -f postgresql-adminer.docker-compose.yml up -d
-   ```
+Or use the Makefile:
 
-3. **Stop and remove the service when done:**
+```bash
+make init
+```
 
-   ```bash
-   docker compose -f <filename> down
-   ```
+### 3. Start Caddy Docker Proxy
+
+Start the Caddy reverse proxy first:
+
+```bash
+docker compose -f caddy.docker-compose.yml up -d
+```
+
+Or use the Makefile:
+
+```bash
+make caddy
+```
+
+### 4. Start any service you need
+
+```bash
+# Using Makefile (recommended)
+make postgres
+make redis
+make mongo
+
+# Or using docker compose directly
+docker compose -f services/postgres/docker-compose.yml up -d
+docker compose -f services/redis/docker-compose.yml up -d
+```
+
+Common Makefile commands:
+
+```bash
+# Start specific service
+make postgres
+
+# Stop specific service
+make down-postgres
+
+# View logs
+make logs-postgres
+
+# Start all services
+make up-all
+
+# Stop all services
+make down-all
+
+# Show all available commands
+make help
+```
+
+### 5. Access services via browser
+
+All services are automatically accessible via HTTPS at `https://<service>.localhost`:
+
+* **Adminer (PostgreSQL):** <https://adminer.localhost>
+* **Mongo Express:** <https://mongo-express.localhost>
+* **RabbitMQ Management:** <https://rabbitmq.localhost>
+* **Redis Commander:** <https://redis-commander.localhost>
+* **RedisInsight:** <https://redisinsight.localhost>
+* **ChartDB:** <https://chartdb.localhost>
+* **Whoami (test):** <https://whoami.localhost>
+
+### 6. Stop services when done
+
+```bash
+# Stop specific service
+make down-postgres
+
+# Stop all services
+make down-all
+
+# Stop all and remove volumes
+make clean
+```
 
 ---
 
-## 🌐 Access Services with Friendly Local Domains Using Caddy
+## 🔧 How It Works
 
-Instead of accessing your services at `localhost:<port>`, use **Caddy** to access them via pretty local domains like `adminer.localhost`, `rabbit-mq.localhost`, etc.
+### Caddy Docker Proxy
 
-### Option 1: Run Caddy Standalone (Recommended)
+This setup uses **caddy-docker-proxy** which automatically:
 
-Run Caddy directly from this directory without system-wide installation:
+* Detects Docker containers with Caddy labels
+* Creates reverse proxy configurations dynamically
+* Provisions HTTPS certificates (self-signed for `.localhost` domains)
+* Routes traffic based on domain names
 
-```bash
-# Start Caddy with your Caddyfile (foreground)
-caddy run --config Caddyfile
+No manual configuration files needed - just add labels to your services!
 
-# Or run in background
-caddy start --config Caddyfile
+### Label Format
 
-# After editing Caddyfile, reload config (zero downtime)
-caddy reload --config Caddyfile
+Each service uses these labels:
 
-# Stop Caddy
-caddy stop
+```yaml
+labels:
+  caddy: <domain>.localhost
+  caddy.reverse_proxy: "{{upstreams <port>}}"
 ```
-
-**Note:** You must specify `--config Caddyfile` when running from a custom directory. Caddy will remember this path for reload commands.
-
-### Option 2: Install Caddy as System Service (macOS)
-
-If you prefer running Caddy as a system service:
-
-```bash
-# Install via Homebrew
-brew install caddy
-
-# Copy Caddyfile to Caddy config directory
-cp Caddyfile /opt/homebrew/etc/Caddyfile
-
-# Start service
-brew services start caddy
-
-# Restart after config changes
-brew services restart caddy
-```
-
-**Note:** With Option 2, you need to manually copy `Caddyfile` each time you update it.
-
-### Access your services
-
-Once Caddy is running, open your browser and navigate to:
-
-* **Adminer (PostgreSQL):** <https://adminer.localhost>
-* **RabbitMQ Management:** <https://rabbit-mq.localhost>
-* **Redis Commander:** <https://redis-commander.localhost>
-* **Red Insight (Redis):** <https://red-insight.localhost>
-* **ChartDB:** <https://chartdb.localhost>
 
 ---
 
@@ -108,38 +149,102 @@ Once Caddy is running, open your browser and navigate to:
 **Environment Variables** (optional `.env` file):
 
 ```bash
-# PostgreSQL
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
-
-# Adminer
-ADMINER_PORT=8080
 ```
 
-**Access Adminer:**
+**Login credentials for Adminer:**
 
-* **Via Caddy:** <https://adminer.localhost>
-* **Direct:** <http://localhost:8080>
-
-**Login credentials:**
-
-* Server: `postgres` (auto-filled via ADMINER_DEFAULT_SERVER)
+* Server: `postgres`
 * Username: `postgres` (or your POSTGRES_USER)
 * Password: `postgres` (or your POSTGRES_PASSWORD)
 * Database: Leave empty or specify your database name
+
+### MongoDB & Mongo Express
+
+**Environment Variables** (optional `.env` file):
+
+```bash
+MONGO_USER=localhost
+MONGO_PASSWORD=localhost
+```
+
+### RabbitMQ
+
+**Default credentials:**
+
+* Username: `rabbitmq`
+* Password: `rabbitmq`
 
 ---
 
 ## 📝 Additional Notes
 
-### Caddy Benefits
+### Caddy Docker Proxy Benefits
 
-* **Auto HTTPS:** Automatically provides HTTPS certificates for local domains – no manual SSL setup required
-* **Zero Downtime:** Use `caddy reload` to apply config changes without stopping
-* **Simple Config:** Clean, easy-to-read Caddyfile syntax
+* **Auto Discovery:** Automatically detects containers via Docker socket
+* **Auto HTTPS:** Self-signed certificates for `.localhost` domains
+* **Zero Config:** No Caddyfile needed - everything via labels
+* **Dynamic Updates:** Add/remove services without restarting Caddy
 
 ### Troubleshooting
+
+**Browser warning "Your connection is not private" (NET::ERR_CERT_AUTHORITY_INVALID):**
+
+This is normal for `.localhost` domains with self-signed certificates. You have 3 options:
+
+#### Option 1: Bypass the warning (Quick)
+
+* Click "Advanced" → "Proceed to [site].localhost (unsafe)"
+* Or type `thisisunsafe` on the warning page (no input field needed)
+
+#### Option 2: Trust Caddy CA Certificate (Recommended for WSL2/Windows)
+
+1. Extract the Caddy root certificate:
+
+   ```bash
+   docker compose -f caddy.docker-compose.yml exec caddy cat /data/caddy/pki/authorities/local/root.crt > caddy-root.crt
+   ```
+
+2. Import to Windows Certificate Store:
+   * Open file explorer: `explorer.exe .`
+   * Double-click `caddy-root.crt`
+   * Click "Install Certificate"
+   * Select "Current User" → Next
+   * Choose "Place all certificates in the following store" → Browse
+   * Select "Trusted Root Certification Authorities" → OK
+   * Next → Finish
+   * Restart your browser
+
+3. All `.localhost` sites will now show secure HTTPS!
+
+#### Option 3: Trust on Linux (Ubuntu/Debian)
+
+```bash
+sudo cp caddy-root.crt /usr/local/share/ca-certificates/caddy-local.crt
+sudo update-ca-certificates
+```
+
+**Caddy network not found:**
+
+```bash
+# Create the network
+docker network create caddy
+```
+
+**Service not accessible via domain:**
+
+```bash
+# Check if Caddy is running
+docker ps | grep caddy
+
+# View Caddy logs
+docker compose -f caddy.docker-compose.yml logs -f
+
+# Restart Caddy to pick up new services
+docker compose -f caddy.docker-compose.yml restart
+```
 
 **Port conflicts:**
 
@@ -147,20 +252,7 @@ ADMINER_PORT=8080
 # Check what's using a port
 lsof -i :<port_number>
 
-# Example: Check PostgreSQL port
-lsof -i :5432
-```
-
-**Caddy not working:**
-
-```bash
-# Validate Caddyfile syntax
-caddy validate --config Caddyfile
-
-# Format Caddyfile
-caddy fmt --overwrite Caddyfile
-
-# Check if ports 80/443 are available
+# Example: Check if port 80/443 are available
 sudo lsof -i :80
 sudo lsof -i :443
 ```
@@ -169,35 +261,59 @@ sudo lsof -i :443
 
 ```bash
 # View logs
-docker compose -f <filename> logs -f
+make logs-<service>
+
+# Or with docker compose
+docker compose -f services/<service>/docker-compose.yml logs -f
 
 # Check container status
 docker ps -a
+
+# Check networks
+docker network ls
+docker network inspect caddy
 ```
 
 ### Adding New Services
 
-1. Create `service-name.docker-compose.yml`
-2. Add to `Caddyfile`:
+1. Create service directory: `services/your-service/`
 
-   ```caddyfile
-   service-name.localhost {
-       tls internal
-       reverse_proxy localhost:<port>
-   }
+2. Add `docker-compose.yml`:
+
+   ```yaml
+   services:
+     your-service:
+       image: your-image
+       container_name: your-service
+       networks:
+         - service-network
+         - caddy
+       labels:
+         caddy: your-service.localhost
+         caddy.reverse_proxy: "{{upstreams <port>}}"
+       restart: unless-stopped
+
+   networks:
+     service-network:
+       driver: bridge
+     caddy:
+       external: true
    ```
 
-3. Reload Caddy: `caddy reload --config Caddyfile`
-4. Update this README
+3. Add `README.md` and `.env.example` (optional)
+
+4. Start the service - Caddy will auto-detect it!
+
+   ```bash
+   make your-service
+   ```
 
 ---
 
 ## 💡 Contributions
 
-* Got a new service or a helpful tip? Feel free to submit a PR or open an issue!
+Got a new service or a helpful tip? Feel free to submit a PR or open an issue!
 
 ---
 
 Happy coding and enjoy your streamlined local environment! 🚀
-
----

@@ -1,0 +1,21 @@
+services:
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # Required for some Caddy features like QUIC
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile # Mount your Caddyfile
+      - ./site:/srv                      # Mount your static site files (if serving static content)
+      - caddy_data:/data                 # Persistent storage for Caddy's data (certs, etc.)
+      - caddy_config:/config             # Persistent storage for Caddy's config
+    # environment:
+      # Optional environment variables for Caddy
+      # CADDY_HOSTNAME: example.com
+      # CADDY_EMAIL: your-email@example.com
+
+volumes:
+  caddy_data:
+  caddy_config:

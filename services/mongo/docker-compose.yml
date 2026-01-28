@@ -1,7 +1,7 @@
 services:
   mongo:
-    image: mongo:latest
     container_name: mongo
+    image: mongo:latest
     ports:
       - 27017:27017
     environment:
@@ -10,29 +10,9 @@ services:
     volumes:
       - ./data/mongo/:/data/db/
     networks:
-      - mongo
-    restart: unless-stopped
-
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER:-localhost}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-localhost}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER:-localhost}:${MONGO_PASSWORD:-localhost}@mongo:27017/
-      ME_CONFIG_BASICAUTH: false
-    networks:
-      - mongo
       - caddy
-    labels:
-      caddy: mongo-express.localhost
-      caddy.reverse_proxy: "{{upstreams 8081}}"
-    depends_on:
-      - mongo
     restart: unless-stopped
 
 networks:
-  mongo:
-    driver: bridge
   caddy:
     external: true

@@ -21,6 +21,9 @@ data/
 .vscode/
 .idea/
 
+# Claude
+.claude/
+
 # Temporary files
 *.tmp
 *.temp

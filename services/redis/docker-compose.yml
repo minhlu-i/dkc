@@ -1,50 +1,18 @@
 services:
   redis:
-    image: redis:latest
     container_name: redis
     hostname: redis
+    image: redis:latest
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes # Dev mode only
+      - ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - ./data/redis:/data
     ports:
-      - "6379:6379" # Expose Redis port to host
+      - "6379:6379"
     networks:
-      - redis-network
-    restart: unless-stopped
-
-  redis-commander:
-    container_name: redis-commander
-    hostname: redis-commander
-    image: ghcr.io/joeferner/redis-commander:latest
-    environment:
-      - REDIS_HOSTS=local:redis:6379
-    user: redis
-    networks:
-      - redis-network
       - caddy
-    labels:
-      caddy: redis-commander.localhost
-      caddy.reverse_proxy: "{{upstreams 8081}}"
-    restart: unless-stopped
-
-  redisinsight:
-    container_name: redisinsight
-    hostname: redisinsight
-    image: redis/redisinsight:latest
-    user: "0:0"  # Run as root to fix permission issues
-    volumes:
-      - ./data/redisinsight:/data
-    networks:
-      - redis-network
-      - caddy
-    labels:
-      caddy: redisinsight.localhost
-      caddy.reverse_proxy: "{{upstreams 5540}}"
     restart: unless-stopped
 
 networks:
-  redis-network:
-    driver: bridge
   caddy:
     external: true

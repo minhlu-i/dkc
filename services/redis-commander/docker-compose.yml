@@ -1,0 +1,18 @@
+services:
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    user: redis
+    networks:
+      - caddy
+    labels:
+      caddy: redis-commander.localhost
+      caddy.reverse_proxy: "{{upstreams 8081}}"
+    restart: unless-stopped
+
+networks:
+  caddy:
+    external: true

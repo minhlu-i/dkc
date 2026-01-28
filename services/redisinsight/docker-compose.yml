@@ -1,0 +1,18 @@
+services:
+  redisinsight:
+    container_name: redisinsight
+    hostname: redisinsight
+    image: redis/redisinsight:latest
+    user: "0:0"
+    volumes:
+      - ./data/redisinsight:/data
+    networks:
+      - caddy
+    labels:
+      caddy: redisinsight.localhost
+      caddy.reverse_proxy: "{{upstreams 5540}}"
+    restart: unless-stopped
+
+networks:
+  caddy:
+    external: true

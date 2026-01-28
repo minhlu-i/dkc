@@ -1,0 +1,19 @@
+services:
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express:latest
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER:-localhost}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-localhost}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER:-localhost}:${MONGO_PASSWORD:-localhost}@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - caddy
+    labels:
+      caddy: mongo-express.localhost
+      caddy.reverse_proxy: "{{upstreams 8081}}"
+    restart: unless-stopped
+
+networks:
+  caddy:
+    external: true

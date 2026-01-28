@@ -1,0 +1,17 @@
+services:
+  adminer:
+    container_name: adminer
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: nette
+    networks:
+      - caddy
+    labels:
+      caddy: adminer.localhost
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+    restart: unless-stopped
+
+networks:
+  caddy:
+    external: true
